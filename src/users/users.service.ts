@@ -1,9 +1,14 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schemas/users.schema';
 import * as bcrypt from 'bcrypt';
 import { PermitService } from '../permit/permit.service';
+import { Types } from 'mongoose';
 
 interface CreateUserDto {
   email: string;
@@ -20,6 +25,15 @@ export class UsersService {
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ email }).exec();
+  }
+
+  async userExists(userId: string): Promise<boolean> {
+    if (!isValidObjectId(userId)) {
+      return false;
+    }
+
+    const count = await this.userModel.countDocuments({ _id: userId }).exec();
+    return count > 0;
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -57,4 +71,29 @@ export class UsersService {
     }
     return savedUser;
   }
+
+  async getBasicUserInfo(userId: string): Promise<{
+    id: string;
+    email: string;
+    role: string;
+  }> {
+    if (!isValidObjectId(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    const user = await this.userModel.findById(userId).exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return {
+      id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    };
+  }
+}
+function isValidObjectId(userId: string): boolean {
+  return Types.ObjectId.isValid(userId);
 }

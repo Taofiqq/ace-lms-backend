@@ -6,6 +6,11 @@ import { UsersModule } from './users/users.module';
 import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 import { PermitModule } from './permit/permit.module';
+import { LearningModule } from './learning/learning.module';
+import { MVKModule } from './mvk/mvk.module';
+import { AssessmentModule } from './assessment/assessment.module';
+import { GamificationModule } from './gamification/gamification.module';
+// import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -28,6 +33,11 @@ import { PermitModule } from './permit/permit.module';
     }),
     AuthModule,
     PermitModule,
+    LearningModule,
+    MVKModule,
+    AssessmentModule,
+    GamificationModule,
+    // DashboardModule,
   ],
   controllers: [HealthController],
 })
